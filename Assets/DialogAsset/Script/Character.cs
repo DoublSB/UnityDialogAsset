@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+
+#if UNITY_EDITOR 
+using UnityEditor;
+#endif
 
 namespace Doublsb.Dialog
 {
@@ -13,6 +16,8 @@ namespace Doublsb.Dialog
         public Sprite[] Emotions;
         public AudioClip[] SE;
     }
+
+#if UNITY_EDITOR
 
     [CustomEditor(typeof(Character))]
     public class CharacterEditor : Editor
@@ -45,4 +50,6 @@ namespace Doublsb.Dialog
             }
         }
     }
+
+#endif
 }

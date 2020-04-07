@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 4f641f4d6868afe4b85c5c0d5fe6f5c1
+guid: 17634245762b6db4d8d4c494af41f721
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -8,10 +8,11 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: ON IGothic
+  fontName: NanumSquare
   fontNames:
-  - ON IGothic
-  fallbackFontReferences: []
+  - NanumSquare
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 07211f32b4445044eb6e600871cd43b3, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
