@@ -77,11 +77,7 @@ namespace Doublsb.Dialog
 
         private void Show_Emotion(string Text, Character character)
         {
-            Emotion emotion;
-            if (Enum.TryParse(Text, out emotion))
-            {
-                character.GetComponent<Image>().sprite = character.Emotions[(int)emotion];
-            }
+            character.GetComponent<Image>().sprite = character.Emotion.Data[Text];
         }
 
         #endregion
@@ -95,5 +91,18 @@ namespace Doublsb.Dialog
         }
 
         #endregion
+    }
+
+    public class CharacterDatabase
+    {
+        public CharacterDatabase(string JsonData)
+        {
+            JsonUtility.FromJson<CharacterDatabase>(JsonData);
+        }
+
+        public void Add()
+        {
+
+        }
     }
 }

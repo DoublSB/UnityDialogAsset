@@ -12,11 +12,11 @@ namespace Doublsb.Dialog
     [RequireComponent(typeof(Image))]
     public class Character : MonoBehaviour
     {
-        [HideInInspector]
-        public Sprite[] Emotions;
+        public Emotion Emotion;
         public AudioClip[] SE;
     }
 
+    /*
 #if UNITY_EDITOR
 
     [CustomEditor(typeof(Character))]
@@ -52,4 +52,5 @@ namespace Doublsb.Dialog
     }
 
 #endif
+*/
 }
