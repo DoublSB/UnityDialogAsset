@@ -11,12 +11,19 @@ namespace Doublsb.Dialog
     [CustomPropertyDrawer(typeof(Emotion))]
     public class EmotionDrawer : PropertyDrawer
     {
+        //================================================
+        //Private Variable
+        //================================================
         private int ArraySize = 0;
         private string EmotionName = "Input the emotion name";
 
         private SerializedProperty _emotion = null;
         private SerializedProperty _sprite = null;
 
+
+        //================================================
+        //Public Method
+        //================================================
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
@@ -34,6 +41,10 @@ namespace Doublsb.Dialog
             return 18 * (ArraySize + 2);
         }
 
+
+        //================================================
+        //Private Method : init
+        //================================================
         private void _initialize(Rect pos, SerializedProperty property)
         {
             _emotion = property.FindPropertyRelative("_emotion");
@@ -42,6 +53,10 @@ namespace Doublsb.Dialog
             ArraySize = _emotion.arraySize;
         }
 
+
+        //================================================
+        //Private Method : display
+        //================================================
         private void _display_Header(Rect startPos)
         {
             EditorGUI.LabelField(startPos, "Emotion");
@@ -101,6 +116,10 @@ namespace Doublsb.Dialog
             _display_AddButton(_get_Rect(InputRect, InputRect.width + 20, 70));
         }
 
+
+        //================================================
+        //Private Method : methods
+        //================================================
         private void _delete_ArrayElement(SerializedProperty array, int index, bool isObject = false)
         {
             if (isObject && array.GetArrayElementAtIndex(index) != null) array.DeleteArrayElementAtIndex(index);
