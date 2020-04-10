@@ -14,80 +14,123 @@ namespace Doublsb.Dialog
         private int ArraySize = 0;
         private string EmotionName = "Input the emotion name";
 
+        private SerializedProperty _emotion = null;
+        private SerializedProperty _sprite = null;
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            SerializedProperty _emotion = property.FindPropertyRelative("_emotion");
-            SerializedProperty _sprite = property.FindPropertyRelative("_sprite");
-
-            ArraySize = _emotion.arraySize;
-
             EditorGUI.BeginProperty(position, label, property);
 
-            // {
-
-            EditorGUI.LabelField(position, "Emotion");
-
-            EditorGUI.indentLevel++;
-
-            Rect NewRect = new Rect(position.position, new Vector2(position.width / 3, 16));
-
-            for (int i = 0; i < _emotion.arraySize; i++)
-            {
-                NewRect = new Rect(NewRect.position + new Vector2(0, 18), NewRect.size);
-                EditorGUI.PropertyField(NewRect, _emotion.GetArrayElementAtIndex(i), GUIContent.none);
-            }
-
-            NewRect = new Rect(position.position + new Vector2(NewRect.width, 0), new Vector2(NewRect.width, 16));
-
-            for (int i = 0; i < _sprite.arraySize; i++)
-            {
-                NewRect = new Rect(NewRect.position + new Vector2(0, 18), NewRect.size);
-                EditorGUI.PropertyField(NewRect, _sprite.GetArrayElementAtIndex(i), GUIContent.none);
-            }
-
-            NewRect = new Rect(position.position + new Vector2(NewRect.width * 2 + 10, 0), new Vector2(30, 16));
-
-            for (int i = 0; i < _sprite.arraySize; i++)
-            {
-                NewRect = new Rect(NewRect.position + new Vector2(0, 18), NewRect.size);
-                if(GUI.Button(NewRect, "-"))
-                {
-                    int j = i;
-                    _emotion.DeleteArrayElementAtIndex(j);
-
-                    if (_sprite.GetArrayElementAtIndex(j).objectReferenceValue != null)
-                        _sprite.DeleteArrayElementAtIndex(j);
-
-                    _sprite.DeleteArrayElementAtIndex(j);
-                }
-            }
-
-            NewRect = new Rect(position.position + new Vector2(0, 18 * _emotion.arraySize + 30), new Vector2(position.width / 3 * 2, 16));
-
-            EmotionName = EditorGUI.TextField(NewRect, EmotionName);
-
-            if(GUI.Button(new Rect(NewRect.position + new Vector2(NewRect.width + 10, 0), new Vector2(70, 16)), "create"))
-            {
-                _emotion.InsertArrayElementAtIndex(_emotion.arraySize);
-                _emotion.GetArrayElementAtIndex(_emotion.arraySize - 1).stringValue = EmotionName;
-
-                _sprite.InsertArrayElementAtIndex(_sprite.arraySize);
-
-                if(_sprite.GetArrayElementAtIndex(_sprite.arraySize - 1).objectReferenceValue != null)
-                    _sprite.DeleteArrayElementAtIndex(_sprite.arraySize - 1);
-
-                EmotionName = "";
-            }
-
-            // }
+            _initialize(position, property);
+            _display_Header(position);
+            _display_EmotionList(position);
+            _display_AddArea(position);
 
             EditorGUI.EndProperty();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return 16 * (ArraySize + 4);
+            return 18 * (ArraySize + 2);
         }
+
+        private void _initialize(Rect pos, SerializedProperty property)
+        {
+            _emotion = property.FindPropertyRelative("_emotion");
+            _sprite = property.FindPropertyRelative("_sprite");
+
+            ArraySize = _emotion.arraySize;
+        }
+
+        private void _display_Header(Rect startPos)
+        {
+            EditorGUI.LabelField(startPos, "Emotion");
+            EditorGUI.indentLevel++;
+        }
+
+        private void _display_Array(Rect startPos, SerializedProperty array)
+        {
+            for (int i = 0; i < array.arraySize; i++)
+            {
+                startPos = new Rect(startPos.position + new Vector2(0, 18), startPos.size);
+                EditorGUI.PropertyField(startPos, array.GetArrayElementAtIndex(i), GUIContent.none);
+            }
+        }
+
+        private void _display_DeleteButton(Rect startPos)
+        {
+            for (int i = 0; i < _sprite.arraySize; i++)
+            {
+                startPos = new Rect(startPos.position + new Vector2(0, 18), startPos.size);
+                if (GUI.Button(startPos, "-"))
+                {
+                    int j = i;
+                    _delete_Raw(j);
+                }
+            }
+        }
+
+        private void _display_EmotionList(Rect startPos)
+        {
+            Rect NewRect = new Rect(startPos.position, new Vector2(startPos.width / 3, 16));
+
+            _display_Array(NewRect, _emotion);
+            _display_Array(_get_Rect(NewRect, NewRect.width, NewRect.width), _sprite);
+            _display_DeleteButton(_get_Rect(NewRect, NewRect.width * 2 + 10, 30));
+        }
+
+        private void _display_AddButton(Rect rect)
+        {
+            if (GUI.Button(rect, "create"))
+            {
+                _add_Raw();
+                EmotionName = "";
+            }
+        }
+
+        private void _display_TextArea(Rect rect)
+        {
+            EmotionName = EditorGUI.TextField(rect, EmotionName);
+        }
+
+        private void _display_AddArea(Rect startPos)
+        {
+            Rect InputRect = _get_Rect(startPos, 0, startPos.width / 3 * 2, (_emotion.arraySize + 1) * 18);
+
+            _display_TextArea(InputRect);
+            _display_AddButton(_get_Rect(InputRect, InputRect.width + 20, 70));
+        }
+
+        private void _delete_ArrayElement(SerializedProperty array, int index, bool isObject = false)
+        {
+            if (isObject && array.GetArrayElementAtIndex(index) != null) array.DeleteArrayElementAtIndex(index);
+            array.DeleteArrayElementAtIndex(index);
+        }
+
+        private void _delete_Raw(int index)
+        {
+            _delete_ArrayElement(_emotion, index);
+            _delete_ArrayElement(_sprite, index, true);
+        }
+
+        private void _add_Raw()
+        {
+            _emotion.InsertArrayElementAtIndex(_emotion.arraySize);
+            _emotion.GetArrayElementAtIndex(_emotion.arraySize - 1).stringValue = EmotionName;
+
+            _sprite.InsertArrayElementAtIndex(_sprite.arraySize);
+        }
+
+        private Rect _get_Rect(Rect From, float x, float width)
+        {
+            return new Rect(From.position + new Vector2(x, 0), new Vector2(width, 16));
+        }
+
+        private Rect _get_Rect(Rect From, float x, float width, float y)
+        {
+            return new Rect(From.position + new Vector2(x, y), new Vector2(width, 16));
+        }
+
     }
 }
 #endif
