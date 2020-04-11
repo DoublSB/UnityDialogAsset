@@ -854,13 +854,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Emotion:
     _emotion:
-    - Happy
     - Normal
-    - Sad
+    - Happy
     _sprite:
-    - {fileID: 21300000, guid: 77fa19401d8472a498f2164bce0d7a4b, type: 3}
     - {fileID: 21300000, guid: 34f96a43c2ac0804b95b2e3ab9751332, type: 3}
-    - {fileID: 21300000, guid: 8f01fa9aca81c9142a73bb0c759a88de, type: 3}
+    - {fileID: 21300000, guid: 77fa19401d8472a498f2164bce0d7a4b, type: 3}
   SE:
   - {fileID: 8300000, guid: 32d4b1811dda14a6cb9e059ee8ad17d2, type: 3}
 --- !u!114 &1888300538

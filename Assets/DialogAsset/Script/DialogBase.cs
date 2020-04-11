@@ -7,6 +7,8 @@ namespace Doublsb.Dialog
     public enum State
     {
         Show,
+        Texting,
+        WaitForInput,
         Wait,
         Hide
     }

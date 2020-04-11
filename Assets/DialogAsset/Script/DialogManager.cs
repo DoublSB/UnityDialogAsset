@@ -8,7 +8,11 @@ namespace Doublsb.Dialog
 {
     public class DialogManager : MonoBehaviour
     {
+        //================================================
+        //Public Variable
+        //================================================
         [Header("Object Mapping")]
+        public GameObject Window;
         public Text text;
         public AudioSource Audio;
 
@@ -17,17 +21,47 @@ namespace Doublsb.Dialog
         [HideInInspector]
         public State state;
 
+
+        //================================================
+        //Private Method
+        //================================================
         private float SpeakTime;
 
-        private void Start()
-        {
-            Show("이것은 대화창이다. [Sad]하지만 '언젠가는' 완성되겠지. [Happy]^O^", character);
-        }
 
+        //================================================
+        //Public Method
+        //================================================
         public void Show(string Text, Character character)
         {
+            Window.SetActive(true);
             Initialize(null);
             StartCoroutine(Texting(Text, character));
+        }
+
+        public void Click_Window()
+        {
+            switch (state)
+            {
+                case State.Texting:
+                    StartCoroutine(Skip()); break;
+
+                case State.WaitForInput:
+                    Hide(); break;
+            }
+        }
+
+        public void Hide()
+        {
+            StopAllCoroutines();
+            Window.SetActive(false);
+        }
+
+        //================================================
+        //Private Method
+        //================================================
+        private void Start()
+        {
+            Show("이것은 대화창이다. /Sad/하지만 '언젠가는' 완성되겠지. /Happy/^O^", character);
         }
 
         private void Initialize(Image image)
@@ -48,12 +82,14 @@ namespace Doublsb.Dialog
 
         private IEnumerator Texting(string Text, Character character)
         {
+            state = State.Texting;
+
             for (int i = 0; i < Text.Length; i++)
             {
-                if (Text[i] == '[')
+                if (Text[i] == '/')
                 {
                     string SubStringResult = Text.Substring(i + 1);
-                    int charLength = Get_CharIndexLength(SubStringResult, ']');
+                    int charLength = Get_CharIndexLength(SubStringResult, '/');
 
                     Show_Emotion(SubStringResult.Substring(0, charLength), character);
 
@@ -66,8 +102,10 @@ namespace Doublsb.Dialog
 
                 if (Text[i] != ' ') Play_SE(character);
 
-                yield return new WaitForSeconds(SpeakTime);
+                if(SpeakTime != 0) yield return new WaitForSeconds(SpeakTime);
             }
+
+            state = State.WaitForInput;
         }
 
         private int Get_CharIndexLength(string Text, char chr)
@@ -78,6 +116,13 @@ namespace Doublsb.Dialog
         private void Show_Emotion(string Text, Character character)
         {
             character.GetComponent<Image>().sprite = character.Emotion.Data[Text];
+        }
+
+        private IEnumerator Skip()
+        {
+            SpeakTime = 0;
+            while (state != State.WaitForInput) yield return null;
+            SpeakTime = 1;
         }
 
         #endregion
@@ -91,18 +136,5 @@ namespace Doublsb.Dialog
         }
 
         #endregion
-    }
-
-    public class CharacterDatabase
-    {
-        public CharacterDatabase(string JsonData)
-        {
-            JsonUtility.FromJson<CharacterDatabase>(JsonData);
-        }
-
-        public void Add()
-        {
-
-        }
     }
 }
