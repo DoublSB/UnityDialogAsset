@@ -52,7 +52,7 @@ namespace Doublsb.Dialog
                     identifier = string.Empty;
 
                     int closeIndex = _originalText.IndexOf('/', i + 1);
-                    string commandSyntex = _originalText.Substring(i + 1, closeIndex - i);
+                    string commandSyntex = _originalText.Substring(i + 1, closeIndex - i - 1);
                     var com = _convertToCommand(commandSyntex);
 
                     if (com != null) Commands.Add(com);
