@@ -61,7 +61,7 @@ namespace Doublsb.Dialog
         //================================================
         private void Start()
         {
-            Show("이것은 대화창이다. /Sad/하지만 '언젠가는' 완성되겠지. /Happy/^O^", character);
+            Show("이것은 대화창이다. /emote:Sad/하지만 '언젠가는' 완성되겠지. /emote:Happy/^O^", character);
         }
 
         private void Initialize(Image image)
@@ -84,28 +84,36 @@ namespace Doublsb.Dialog
         {
             state = State.Texting;
 
-            for (int i = 0; i < Text.Length; i++)
+            text.text = string.Empty;
+            var dialogText = new DialogText(Text);
+
+            foreach (var item in dialogText.Commands)
             {
-                if (Text[i] == '/')
+                switch (item.Command)
                 {
-                    string SubStringResult = Text.Substring(i + 1);
-                    int charLength = Get_CharIndexLength(SubStringResult, '/');
-
-                    Show_Emotion(SubStringResult.Substring(0, charLength), character);
-
-                    i += charLength + 1;
+                    case Command.text:
+                        yield return StartCoroutine(_showText(item.Context));
+                        break;
+                    case Command.color:
+                        break;
+                    case Command.emote:
+                        Show_Emotion(item.Context, character);
+                        break;
                 }
-                else
-                {
-                    text.text += Text[i];
-                }
-
-                if (Text[i] != ' ') Play_SE(character);
-
-                if(SpeakTime != 0) yield return new WaitForSeconds(SpeakTime);
             }
 
             state = State.WaitForInput;
+        }
+
+        private IEnumerator _showText(string Text)
+        {
+            for (int i = 0; i < Text.Length; i++)
+            {
+                text.text += Text[i];
+
+                if (Text[i] != ' ') Play_SE(character);
+                if (SpeakTime != 0) yield return new WaitForSeconds(SpeakTime);
+            }
         }
 
         private int Get_CharIndexLength(string Text, char chr)
