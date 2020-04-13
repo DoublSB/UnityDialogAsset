@@ -19,17 +19,55 @@ namespace Doublsb.Dialog
     {
         text,
         color,
-        emote
+        emote,
+        size
     }
 
     public class DialogText
     {
         public List<DialogCommand> Commands;
-        private string _originalText;
+        public List<Command> CloseCommands;
 
-        public DialogText(string OriginalText)
+        public int Size;
+
+        public string BackText
+        {
+            get
+            {
+                string result = string.Empty;
+
+                for (int i = CloseCommands.Count - 1; i >= 0; i--)
+                {
+                    switch (CloseCommands[i])
+                    {
+                        case Command.color:
+                            result += "</color>";
+                            break;
+                        case Command.size:
+                            result += "</size>";
+                            break;
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        public string PrintText;
+
+        private string _originalText;
+        
+        public DialogText(string OriginalText, int size)
         {
             _originalText = OriginalText;
+
+            CloseCommands = new List<Command>();
+            PrintText = string.Empty;
+
+            Size = size;
+
+            Debug.Log(Size);
+
             _convertToCommand();
         }
 

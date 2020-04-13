@@ -20,6 +20,7 @@ namespace Doublsb.Dialog
 
         [HideInInspector]
         public State state;
+        public DialogText CurrentText;
 
 
         //================================================
@@ -61,7 +62,7 @@ namespace Doublsb.Dialog
         //================================================
         private void Start()
         {
-            Show("이것은 대화창이다. /emote:Sad/하지만 '언젠가는' 완성되겠지. /emote:Happy/^O^", character);
+            Show("/color:red/^O^/size:down/hi", character);
         }
 
         private void Initialize(Image image)
@@ -85,9 +86,9 @@ namespace Doublsb.Dialog
             state = State.Texting;
 
             text.text = string.Empty;
-            var dialogText = new DialogText(Text);
+            CurrentText = new DialogText(Text, text.fontSize);
 
-            foreach (var item in dialogText.Commands)
+            foreach (var item in CurrentText.Commands)
             {
                 switch (item.Command)
                 {
@@ -95,9 +96,13 @@ namespace Doublsb.Dialog
                         yield return StartCoroutine(_showText(item.Context));
                         break;
                     case Command.color:
+                        _coloring(item.Context);
                         break;
                     case Command.emote:
                         Show_Emotion(item.Context, character);
+                        break;
+                    case Command.size:
+                        _sizing(item.Context);
                         break;
                 }
             }
@@ -109,11 +114,58 @@ namespace Doublsb.Dialog
         {
             for (int i = 0; i < Text.Length; i++)
             {
-                text.text += Text[i];
+                CurrentText.PrintText += Text[i];
+                text.text = CurrentText.PrintText + CurrentText.BackText;
 
                 if (Text[i] != ' ') Play_SE(character);
                 if (SpeakTime != 0) yield return new WaitForSeconds(SpeakTime);
             }
+        }
+
+        private void _coloring(string Color)
+        {
+            int existIndex = CurrentText.CloseCommands.LastIndexOf(Command.color);
+            if (existIndex > 0)
+            {
+                CurrentText.CloseCommands.RemoveAt(existIndex);
+                CurrentText.PrintText += "</color>";
+            }
+
+            CurrentText.PrintText += $"<color={Color}>";
+            CurrentText.CloseCommands.Add(Command.color);
+        }
+
+        private void _sizing(string Size)
+        {
+            int existIndex = CurrentText.CloseCommands.LastIndexOf(Command.size);
+            if (existIndex > 0)
+            {
+                CurrentText.CloseCommands.RemoveAt(existIndex);
+
+                switch (Size)
+                {
+                    case "up":
+                        CurrentText.Size += 2;
+                        break;
+
+                    case "down":
+                        CurrentText.Size -= 5;
+                        break;
+
+                    case "init":
+                        CurrentText.Size = text.fontSize;
+                        break;
+
+                    default:
+                        CurrentText.Size = int.Parse(Size);
+                        break;
+                }
+
+                CurrentText.PrintText += "</size>";
+            }
+
+            CurrentText.PrintText += $"<size={CurrentText.Size}>";
+            CurrentText.CloseCommands.Add(Command.size);
         }
 
         private int Get_CharIndexLength(string Text, char chr)
