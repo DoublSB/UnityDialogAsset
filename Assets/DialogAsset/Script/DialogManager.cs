@@ -62,7 +62,7 @@ namespace Doublsb.Dialog
         //================================================
         private void Start()
         {
-            Show("/color:red/^O^/size:down/hi", character);
+            Show("/emote:Sad/드디어 편안해졌구려./emote:Happy/ 소인, /size:up/감복하였소. /size:init/앞으로도 /color:red/행복 코딩/color:white/이 하고 싶소.", character);
         }
 
         private void Initialize(Image image)
@@ -95,12 +95,15 @@ namespace Doublsb.Dialog
                     case Command.text:
                         yield return StartCoroutine(_showText(item.Context));
                         break;
+
                     case Command.color:
                         _coloring(item.Context);
                         break;
+
                     case Command.emote:
                         Show_Emotion(item.Context, character);
                         break;
+
                     case Command.size:
                         _sizing(item.Context);
                         break;
@@ -140,28 +143,27 @@ namespace Doublsb.Dialog
             int existIndex = CurrentText.CloseCommands.LastIndexOf(Command.size);
             if (existIndex > 0)
             {
-                CurrentText.CloseCommands.RemoveAt(existIndex);
-
-                switch (Size)
-                {
-                    case "up":
-                        CurrentText.Size += 2;
-                        break;
-
-                    case "down":
-                        CurrentText.Size -= 5;
-                        break;
-
-                    case "init":
-                        CurrentText.Size = text.fontSize;
-                        break;
-
-                    default:
-                        CurrentText.Size = int.Parse(Size);
-                        break;
-                }
-
                 CurrentText.PrintText += "</size>";
+                CurrentText.CloseCommands.RemoveAt(existIndex);
+            }
+
+            switch (Size)
+            {
+                case "up":
+                    CurrentText.Size += 10;
+                    break;
+
+                case "down":
+                    CurrentText.Size -= 10;
+                    break;
+
+                case "init":
+                    CurrentText.Size = text.fontSize;
+                    break;
+
+                default:
+                    CurrentText.Size = int.Parse(Size);
+                    break;
             }
 
             CurrentText.PrintText += $"<size={CurrentText.Size}>";

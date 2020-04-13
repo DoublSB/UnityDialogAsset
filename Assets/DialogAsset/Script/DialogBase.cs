@@ -65,9 +65,6 @@ namespace Doublsb.Dialog
             PrintText = string.Empty;
 
             Size = size;
-
-            Debug.Log(Size);
-
             _convertToCommand();
         }
 
