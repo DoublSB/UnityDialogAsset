@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UnityEngine.Events;
 
 namespace Doublsb.Dialog
 {
@@ -14,29 +15,33 @@ namespace Doublsb.Dialog
         [Header("Object Mapping")]
         public GameObject Window;
         public Text text;
-        public AudioSource Audio;
+        public AudioSource SEAudio;
+        public AudioSource CallAudio;
 
         public Character character;
 
         [HideInInspector]
         public State state;
         public DialogText CurrentText;
-
+        public bool cannotSkip;
 
         //================================================
         //Private Method
         //================================================
         private float SpeakTime;
-
+        private float LastSpeakTime;
+        private UnityAction _callback;
 
         //================================================
         //Public Method
         //================================================
-        public void Show(string Text, Character character)
+        public void Show(string Text, Character character, bool CannotSkip = false, UnityAction Callback = null)
         {
+            _callback = Callback;
+
             Window.SetActive(true);
             Initialize(null);
-            StartCoroutine(Texting(Text, character));
+            StartCoroutine(Texting(Text, character, CannotSkip));
         }
 
         public void Click_Window()
@@ -55,6 +60,8 @@ namespace Doublsb.Dialog
         {
             StopAllCoroutines();
             Window.SetActive(false);
+
+            if(_callback != null) _callback.Invoke();
         }
 
         //================================================
@@ -62,7 +69,7 @@ namespace Doublsb.Dialog
         //================================================
         private void Start()
         {
-            Show("/emote:Sad/드디어 편안해졌구려./emote:Happy/ 소인, /size:up/감복하였소. /size:init/앞으로도 /color:red/행복 코딩/color:white/이 하고 싶소.", character);
+            Show("/emote:Sad/흠... /wait:0.5//emote:Normal/재미있군.", character);
         }
 
         private void Initialize(Image image)
@@ -81,9 +88,11 @@ namespace Doublsb.Dialog
 
         #region Show Text
 
-        private IEnumerator Texting(string Text, Character character)
+        private IEnumerator Texting(string Text, Character character, bool CannotSkip = false)
         {
+            LastSpeakTime = 0.1f;
             state = State.Texting;
+            cannotSkip = CannotSkip;
 
             text.text = string.Empty;
             CurrentText = new DialogText(Text, text.fontSize);
@@ -107,10 +116,41 @@ namespace Doublsb.Dialog
                     case Command.size:
                         _sizing(item.Context);
                         break;
+
+                    case Command.sound:
+                        Play_CallSE(character, item.Context);
+                        break;
+
+                    case Command.speed:
+                        Set_Speed(item.Context);
+                        break;
+
+                    case Command.click:
+                        yield return _waitInput();
+                        break;
+
+                    case Command.close:
+                        Hide();
+                        yield break;
+
+                    case Command.wait:
+                        yield return new WaitForSeconds(float.Parse(item.Context));
+                        break;
                 }
             }
 
             state = State.WaitForInput;
+            cannotSkip = false;
+        }
+
+        private IEnumerator _waitInput()
+        {
+            while (!Input.GetMouseButtonDown(0))
+            {
+                yield return null;
+            }
+
+            SpeakTime = LastSpeakTime;
         }
 
         private IEnumerator _showText(string Text)
@@ -120,7 +160,7 @@ namespace Doublsb.Dialog
                 CurrentText.PrintText += Text[i];
                 text.text = CurrentText.PrintText + CurrentText.BackText;
 
-                if (Text[i] != ' ') Play_SE(character);
+                if (Text[i] != ' ') Play_ChatSE(character);
                 if (SpeakTime != 0) yield return new WaitForSeconds(SpeakTime);
             }
         }
@@ -182,19 +222,60 @@ namespace Doublsb.Dialog
 
         private IEnumerator Skip()
         {
-            SpeakTime = 0;
-            while (state != State.WaitForInput) yield return null;
-            SpeakTime = 1;
+            if (!cannotSkip)
+            {
+                SpeakTime = 0;
+                while (state != State.WaitForInput) yield return null;
+                SpeakTime = 1;
+            }
         }
 
         #endregion
 
         #region Sound
 
-        private void Play_SE(Character character)
+        private void Play_ChatSE(Character character)
         {
-            Audio.clip = character.SE[UnityEngine.Random.Range(0, character.SE.Length)];
-            Audio.Play();
+            SEAudio.clip = character.ChatSE[UnityEngine.Random.Range(0, character.ChatSE.Length)];
+            SEAudio.Play();
+        }
+
+        private void Play_CallSE(Character character, string SEname)
+        {
+            var FindSE 
+                = Array.Find(character.CallSE, (SE) => SE.name == SEname);
+
+            CallAudio.clip = FindSE;
+            CallAudio.Play();
+        }
+
+        #endregion
+
+        #region Speed
+
+        private void Set_Speed(string speed)
+        {
+            switch (speed)
+            {
+                case "up":
+                    SpeakTime -= 0.25f;
+                    if (SpeakTime <= 0) SpeakTime = 0.001f;
+                    break;
+
+                case "down":
+                    SpeakTime += 0.25f;
+                    break;
+
+                case "init":
+                    SpeakTime = 1;
+                    break;
+
+                default:
+                    SpeakTime = float.Parse(speed);
+                    break;
+            }
+
+            LastSpeakTime = SpeakTime;
         }
 
         #endregion

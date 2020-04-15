@@ -13,7 +13,8 @@ namespace Doublsb.Dialog
     public class Character : MonoBehaviour
     {
         public Emotion Emotion;
-        public AudioClip[] SE;
+        public AudioClip[] ChatSE;
+        public AudioClip[] CallSE;
     }
 
     /*

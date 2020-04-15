@@ -20,7 +20,12 @@ namespace Doublsb.Dialog
         text,
         color,
         emote,
-        size
+        size,
+        sound,
+        speed,
+        click,
+        close,
+        wait
     }
 
     public class DialogText
@@ -105,8 +110,10 @@ namespace Doublsb.Dialog
 
             Command command;
             if (Enum.TryParse(spliter[0], out command))
-                return new DialogCommand(command, spliter[1]);
-
+            {
+                if(spliter.Length >= 2) return new DialogCommand(command, spliter[1]);
+                else return new DialogCommand(command);
+            }
             else
                 Debug.LogError("Cannot parse to commands");
 
@@ -119,7 +126,7 @@ namespace Doublsb.Dialog
         public Command Command;
         public string Context;
 
-        public DialogCommand(Command command, string context)
+        public DialogCommand(Command command, string context = "")
         {
             Command = command;
             Context = context;
