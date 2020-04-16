@@ -31,17 +31,25 @@ namespace Doublsb.Dialog
         private float SpeakTime;
         private float LastSpeakTime;
         private UnityAction _callback;
+        private Coroutine _textingRoutine;
 
         //================================================
         //Public Method
         //================================================
+        public void Show(List<string> Text, Character character, bool CannotSkip = false, UnityAction Callback = null)
+        {
+            Window.SetActive(true);
+            Initialize(null);
+            StartCoroutine(Texting(Text, character, CannotSkip, Callback));
+        }
+
         public void Show(string Text, Character character, bool CannotSkip = false, UnityAction Callback = null)
         {
             _callback = Callback;
 
             Window.SetActive(true);
             Initialize(null);
-            StartCoroutine(Texting(Text, character, CannotSkip));
+            _textingRoutine = StartCoroutine(Texting(Text, character, CannotSkip));
         }
 
         public void Click_Window()
@@ -58,20 +66,16 @@ namespace Doublsb.Dialog
 
         public void Hide()
         {
-            StopAllCoroutines();
+            StopCoroutine(_textingRoutine);
             Window.SetActive(false);
 
-            if(_callback != null) _callback.Invoke();
+            if (_callback != null) _callback.Invoke();
+            else state = State.Hide;
         }
 
         //================================================
         //Private Method
         //================================================
-        private void Start()
-        {
-            Show("/emote:Sad/흠... /wait:0.5//emote:Normal/재미있군.", character);
-        }
-
         private void Initialize(Image image)
         {
             SpeakTime = 0.1f;
@@ -87,6 +91,18 @@ namespace Doublsb.Dialog
 
 
         #region Show Text
+
+        private IEnumerator Texting(List<string> Text, Character character, bool CannotSkip = false, UnityAction Callback = null)
+        {
+            foreach (var item in Text)
+            {
+                Show(item, character, CannotSkip);
+
+                while (state != State.Hide) { yield return null; }
+            }
+
+            Callback.Invoke();
+        }
 
         private IEnumerator Texting(string Text, Character character, bool CannotSkip = false)
         {

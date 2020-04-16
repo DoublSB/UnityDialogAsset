@@ -61,8 +61,8 @@ namespace Doublsb.Dialog
         public string PrintText;
 
         private string _originalText;
-        
-        public DialogText(string OriginalText, int size)
+
+        public DialogText(string OriginalText = "", int size = 30)
         {
             _originalText = OriginalText;
 
