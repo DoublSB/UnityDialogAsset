@@ -31,45 +31,28 @@ namespace Doublsb.Dialog
     public class DialogText
     {
         public List<DialogCommand> Commands;
-        public List<Command> CloseCommands;
 
-        public int Size;
+        public string Color;
+        public string Size;
 
-        public string BackText
-        {
-            get
-            {
-                string result = string.Empty;
+        public string OpenTagger { get => $"<color={Color}><size={Size}>"; }
+        public readonly string CloseTagger = "</size></color>";
 
-                for (int i = CloseCommands.Count - 1; i >= 0; i--)
-                {
-                    switch (CloseCommands[i])
-                    {
-                        case Command.color:
-                            result += "</color>";
-                            break;
-                        case Command.size:
-                            result += "</size>";
-                            break;
-                    }
-                }
-
-                return result;
-            }
-        }
+        public bool hasOpenTagger;
 
         public string PrintText;
 
         private string _originalText;
 
-        public DialogText(string OriginalText = "", int size = 30)
+        public DialogText(string OriginalText = "")
         {
             _originalText = OriginalText;
-
-            CloseCommands = new List<Command>();
             PrintText = string.Empty;
 
-            Size = size;
+            Color = string.Empty;
+            Size = string.Empty;
+            hasOpenTagger = false;
+
             _convertToCommand();
         }
 

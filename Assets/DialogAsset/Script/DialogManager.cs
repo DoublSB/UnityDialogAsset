@@ -101,7 +101,7 @@ namespace Doublsb.Dialog
                 while (state != State.Hide) { yield return null; }
             }
 
-            Callback.Invoke();
+            if(Callback != null) Callback.Invoke();
         }
 
         private IEnumerator Texting(string Text, Character character, bool CannotSkip = false)
@@ -111,18 +111,19 @@ namespace Doublsb.Dialog
             cannotSkip = CannotSkip;
 
             text.text = string.Empty;
-            CurrentText = new DialogText(Text, text.fontSize);
+            CurrentText = new DialogText(Text);
 
             foreach (var item in CurrentText.Commands)
             {
                 switch (item.Command)
                 {
                     case Command.text:
-                        yield return StartCoroutine(_showText(item.Context));
+                        if(item.Context != string.Empty) yield return StartCoroutine(_showText(item.Context));
                         break;
 
                     case Command.color:
-                        _coloring(item.Context);
+                        CurrentText.Color = item.Context;
+                        if (CurrentText.Size == string.Empty) CurrentText.Size = text.fontSize.ToString();
                         break;
 
                     case Command.emote:
@@ -169,61 +170,63 @@ namespace Doublsb.Dialog
             SpeakTime = LastSpeakTime;
         }
 
+        private void _addOpenTagger()
+        {
+            if (CurrentText.Color != string.Empty && CurrentText.Size != string.Empty)
+            {
+                if (CurrentText.hasOpenTagger) CurrentText.PrintText += CurrentText.CloseTagger;
+                CurrentText.PrintText += CurrentText.OpenTagger;
+
+                CurrentText.hasOpenTagger = true;
+            }
+        }
+
+        private void _addCloseTagger()
+        {
+            if (CurrentText.Color != string.Empty && CurrentText.Size != string.Empty)
+            {
+                text.text += CurrentText.CloseTagger;
+            }
+        }
+
         private IEnumerator _showText(string Text)
         {
+            _addOpenTagger();
+
             for (int i = 0; i < Text.Length; i++)
             {
                 CurrentText.PrintText += Text[i];
-                text.text = CurrentText.PrintText + CurrentText.BackText;
+                text.text = CurrentText.PrintText;
+                _addCloseTagger();
 
                 if (Text[i] != ' ') Play_ChatSE(character);
                 if (SpeakTime != 0) yield return new WaitForSeconds(SpeakTime);
             }
         }
 
-        private void _coloring(string Color)
-        {
-            int existIndex = CurrentText.CloseCommands.LastIndexOf(Command.color);
-            if (existIndex > 0)
-            {
-                CurrentText.CloseCommands.RemoveAt(existIndex);
-                CurrentText.PrintText += "</color>";
-            }
-
-            CurrentText.PrintText += $"<color={Color}>";
-            CurrentText.CloseCommands.Add(Command.color);
-        }
-
         private void _sizing(string Size)
         {
-            int existIndex = CurrentText.CloseCommands.LastIndexOf(Command.size);
-            if (existIndex > 0)
-            {
-                CurrentText.PrintText += "</size>";
-                CurrentText.CloseCommands.RemoveAt(existIndex);
-            }
+            if (CurrentText.Size == string.Empty) CurrentText.Size = text.fontSize.ToString();
+            if (CurrentText.Color == string.Empty) CurrentText.Color = "white";
 
             switch (Size)
             {
                 case "up":
-                    CurrentText.Size += 10;
+                    CurrentText.Size = (int.Parse(CurrentText.Size) + 10).ToString();
                     break;
 
                 case "down":
-                    CurrentText.Size -= 10;
+                    CurrentText.Size = (int.Parse(CurrentText.Size) - 10).ToString();
                     break;
 
                 case "init":
-                    CurrentText.Size = text.fontSize;
+                    CurrentText.Size = text.fontSize.ToString();
                     break;
 
                 default:
-                    CurrentText.Size = int.Parse(Size);
+                    CurrentText.Size = Size;
                     break;
-            }
-
-            CurrentText.PrintText += $"<size={CurrentText.Size}>";
-            CurrentText.CloseCommands.Add(Command.size);
+            } 
         }
 
         private int Get_CharIndexLength(string Text, char chr)
