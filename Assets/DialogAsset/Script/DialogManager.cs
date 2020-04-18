@@ -12,54 +12,61 @@ namespace Doublsb.Dialog
         //================================================
         //Public Variable
         //================================================
-        [Header("Object Mapping")]
-        public GameObject Window;
-        public Text text;
+        [Header("Game Objects")]
+        public GameObject Printer;
+        public GameObject Characters;
+
+        [Header("UI Objects")]
+        public Text Printer_Text;
+
+        [Header("Audio Objects")]
         public AudioSource SEAudio;
         public AudioSource CallAudio;
 
-        public Character character;
+        [Header("Preference")]
+        public float Delay = 0.1f;
 
         [HideInInspector]
         public State state;
-        public DialogText CurrentText;
-        public bool cannotSkip;
 
         //================================================
         //Private Method
         //================================================
-        private float SpeakTime;
-        private float LastSpeakTime;
+        private Character _current_Character;
+        private DialogData _current_Data;
+
+        private float _currentDelay;
+        private float _lastDelay;
         private UnityAction _callback;
         private Coroutine _textingRoutine;
 
         //================================================
         //Public Method
         //================================================
-        public void Show(List<string> Text, Character character, bool CannotSkip = false, UnityAction Callback = null)
+        #region Show & Hide
+        public void Show(DialogData Data, Character character = null)
         {
-            Window.SetActive(true);
-            Initialize(null);
-            StartCoroutine(Texting(Text, character, CannotSkip, Callback));
+            _current_Data = Data;
+            _current_Character = character;
+
+            _textingRoutine = StartCoroutine(Activate());
         }
 
-        public void Show(string Text, Character character, bool CannotSkip = false, UnityAction Callback = null)
+        public void Show(List<DialogData> Data, Character character = null)
         {
-            _callback = Callback;
+            _current_Character = character;
 
-            Window.SetActive(true);
-            Initialize(null);
-            _textingRoutine = StartCoroutine(Texting(Text, character, CannotSkip));
+            StartCoroutine(Activate_List(Data));
         }
 
         public void Click_Window()
         {
             switch (state)
             {
-                case State.Texting:
-                    StartCoroutine(Skip()); break;
+                case State.Active:
+                    StartCoroutine(_skip()); break;
 
-                case State.WaitForInput:
+                case State.Wait:
                     Hide(); break;
             }
         }
@@ -67,75 +74,118 @@ namespace Doublsb.Dialog
         public void Hide()
         {
             StopCoroutine(_textingRoutine);
-            Window.SetActive(false);
+
+            Printer.SetActive(false);
+            Characters.SetActive(false);
 
             if (_callback != null) _callback.Invoke();
-            else state = State.Hide;
+            else state = State.Deactivate;
         }
+        #endregion
+
+        #region Sound
+
+        public void Play_ChatSE(Character character)
+        {
+            SEAudio.clip = character.ChatSE[UnityEngine.Random.Range(0, character.ChatSE.Length)];
+            SEAudio.Play();
+        }
+
+        public void Play_CallSE(string SEname)
+        {
+            var FindSE
+                = Array.Find(_current_Character.CallSE, (SE) => SE.name == SEname);
+
+            CallAudio.clip = FindSE;
+            CallAudio.Play();
+        }
+
+        #endregion
+
+        #region Speed
+
+        public void Set_Speed(string speed)
+        {
+            switch (speed)
+            {
+                case "up":
+                    _currentDelay -= 0.25f;
+                    if (_currentDelay <= 0) _currentDelay = 0.001f;
+                    break;
+
+                case "down":
+                    _currentDelay += 0.25f;
+                    break;
+
+                case "init":
+                    _currentDelay = Delay;
+                    break;
+
+                default:
+                    _currentDelay = float.Parse(speed);
+                    break;
+            }
+
+            _lastDelay = _currentDelay;
+        }
+
+        #endregion
 
         //================================================
         //Private Method
         //================================================
-        private void Initialize(Image image)
+        private void _initialize()
         {
-            SpeakTime = 0.1f;
+            _currentDelay = Delay;
+            _lastDelay = 0.1f;
+            Printer_Text.text = string.Empty;
 
-            if (image != null)
-            {
-                image.sprite = null;
-                image.color = new Color(0, 0, 0, 0);
-            }
-
-            text.text = "";
+            Printer.SetActive(true);
+            Characters.SetActive(_current_Character != null);
         }
-
 
         #region Show Text
 
-        private IEnumerator Texting(List<string> Text, Character character, bool CannotSkip = false, UnityAction Callback = null)
+        private IEnumerator Activate_List(List<DialogData> DataList)
         {
-            foreach (var item in Text)
+            foreach (var Data in DataList)
             {
-                Show(item, character, CannotSkip);
+                Show(Data, _current_Character);
 
-                while (state != State.Hide) { yield return null; }
+                while (state != State.Deactivate) { yield return null; }
+
+                if (Data.Callback != null) Data.Callback.Invoke();
             }
-
-            if(Callback != null) Callback.Invoke();
         }
 
-        private IEnumerator Texting(string Text, Character character, bool CannotSkip = false)
+        private IEnumerator Activate()
         {
-            LastSpeakTime = 0.1f;
-            state = State.Texting;
-            cannotSkip = CannotSkip;
+            _initialize();
 
-            text.text = string.Empty;
-            CurrentText = new DialogText(Text);
+            state = State.Active;
 
-            foreach (var item in CurrentText.Commands)
+            foreach (var item in _current_Data.Commands)
             {
                 switch (item.Command)
                 {
-                    case Command.text:
-                        if(item.Context != string.Empty) yield return StartCoroutine(_showText(item.Context));
+                    case Command.print:
+                        yield return StartCoroutine(_print(item.Context));
                         break;
 
                     case Command.color:
-                        CurrentText.Color = item.Context;
-                        if (CurrentText.Size == string.Empty) CurrentText.Size = text.fontSize.ToString();
+                        _current_Data.Format.Color = item.Context;
                         break;
 
                     case Command.emote:
-                        Show_Emotion(item.Context, character);
+                        _emote(item.Context);
                         break;
 
                     case Command.size:
-                        _sizing(item.Context);
+                        _current_Data.Format.Resize(item.Context);
                         break;
 
                     case Command.sound:
-                        Play_CallSE(character, item.Context);
+                        Play_CallSE(item.Context);
                         break;
 
                     case Command.speed:
@@ -156,147 +206,47 @@ namespace Doublsb.Dialog
                 }
             }
 
-            state = State.WaitForInput;
-            cannotSkip = false;
+            state = State.Wait;
         }
 
         private IEnumerator _waitInput()
         {
-            while (!Input.GetMouseButtonDown(0))
-            {
-                yield return null;
-            }
-
-            SpeakTime = LastSpeakTime;
+            while (!Input.GetMouseButtonDown(0)) yield return null;
+            _currentDelay = _lastDelay;
         }
 
-        private void _addOpenTagger()
+        private IEnumerator _print(string Text)
         {
-            if (CurrentText.Color != string.Empty && CurrentText.Size != string.Empty)
-            {
-                if (CurrentText.hasOpenTagger) CurrentText.PrintText += CurrentText.CloseTagger;
-                CurrentText.PrintText += CurrentText.OpenTagger;
-
-                CurrentText.hasOpenTagger = true;
-            }
-        }
-
-        private void _addCloseTagger()
-        {
-            if (CurrentText.Color != string.Empty && CurrentText.Size != string.Empty)
-            {
-                text.text += CurrentText.CloseTagger;
-            }
-        }
-
-        private IEnumerator _showText(string Text)
-        {
-            _addOpenTagger();
+            _current_Data.PrintText += _current_Data.Format.OpenTagger;
 
             for (int i = 0; i < Text.Length; i++)
             {
-                CurrentText.PrintText += Text[i];
-                text.text = CurrentText.PrintText;
-                _addCloseTagger();
+                _current_Data.PrintText += Text[i];
+                Printer_Text.text = _current_Data.PrintText + _current_Data.Format.CloseTagger;
 
-                if (Text[i] != ' ') Play_ChatSE(character);
-                if (SpeakTime != 0) yield return new WaitForSeconds(SpeakTime);
+                if (Text[i] != ' ') Play_ChatSE(_current_Character);
+                if (_currentDelay != 0) yield return new WaitForSeconds(_currentDelay);
             }
+
+            _current_Data.PrintText += _current_Data.Format.CloseTagger;
         }
 
-        private void _sizing(string Size)
+        public void _emote(string Text)
         {
-            if (CurrentText.Size == string.Empty) CurrentText.Size = text.fontSize.ToString();
-            if (CurrentText.Color == string.Empty) CurrentText.Color = "white";
+            _current_Character.GetComponent<Image>().sprite = _current_Character.Emotion.Data[Text];
+        }
 
-            switch (Size)
+        private IEnumerator _skip()
+        {
+            if (_current_Data.isSkipable)
             {
-                case "up":
-                    CurrentText.Size = (int.Parse(CurrentText.Size) + 10).ToString();
-                    break;
-
-                case "down":
-                    CurrentText.Size = (int.Parse(CurrentText.Size) - 10).ToString();
-                    break;
-
-                case "init":
-                    CurrentText.Size = text.fontSize.ToString();
-                    break;
-
-                default:
-                    CurrentText.Size = Size;
-                    break;
-            } 
-        }
-
-        private int Get_CharIndexLength(string Text, char chr)
-        {
-            return Text.IndexOf(chr);
-        }
-
-        private void Show_Emotion(string Text, Character character)
-        {
-            character.GetComponent<Image>().sprite = character.Emotion.Data[Text];
-        }
-
-        private IEnumerator Skip()
-        {
-            if (!cannotSkip)
-            {
-                SpeakTime = 0;
-                while (state != State.WaitForInput) yield return null;
-                SpeakTime = 1;
+                _currentDelay = 0;
+                while (state != State.Wait) yield return null;
+                _currentDelay = Delay;
             }
         }
 
         #endregion
 
-        #region Sound
-
-        private void Play_ChatSE(Character character)
-        {
-            SEAudio.clip = character.ChatSE[UnityEngine.Random.Range(0, character.ChatSE.Length)];
-            SEAudio.Play();
-        }
-
-        private void Play_CallSE(Character character, string SEname)
-        {
-            var FindSE 
-                = Array.Find(character.CallSE, (SE) => SE.name == SEname);
-
-            CallAudio.clip = FindSE;
-            CallAudio.Play();
-        }
-
-        #endregion
-
-        #region Speed
-
-        private void Set_Speed(string speed)
-        {
-            switch (speed)
-            {
-                case "up":
-                    SpeakTime -= 0.25f;
-                    if (SpeakTime <= 0) SpeakTime = 0.001f;
-                    break;
-
-                case "down":
-                    SpeakTime += 0.25f;
-                    break;
-
-                case "init":
-                    SpeakTime = 1;
-                    break;
-
-                default:
-                    SpeakTime = float.Parse(speed);
-                    break;
-            }
-
-            LastSpeakTime = SpeakTime;
-        }
-
-        #endregion
     }
 }
