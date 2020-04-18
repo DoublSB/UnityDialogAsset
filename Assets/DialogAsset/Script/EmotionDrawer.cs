@@ -11,6 +11,7 @@ namespace Doublsb.Dialog
     [CustomPropertyDrawer(typeof(Emotion))]
     public class EmotionDrawer : PropertyDrawer
     {
+        #region variables
         //================================================
         //Private Variable
         //================================================
@@ -19,8 +20,9 @@ namespace Doublsb.Dialog
 
         private SerializedProperty _emotion = null;
         private SerializedProperty _sprite = null;
+        #endregion
 
-
+        #region override
         //================================================
         //Public Method
         //================================================
@@ -40,8 +42,9 @@ namespace Doublsb.Dialog
         {
             return 18 * (ArraySize + 2);
         }
+        #endregion
 
-
+        #region init
         //================================================
         //Private Method : init
         //================================================
@@ -52,8 +55,9 @@ namespace Doublsb.Dialog
 
             ArraySize = _emotion.arraySize;
         }
+        #endregion
 
-
+        #region display
         //================================================
         //Private Method : display
         //================================================
@@ -115,8 +119,9 @@ namespace Doublsb.Dialog
             _display_TextArea(InputRect);
             _display_AddButton(_get_Rect(InputRect, InputRect.width + 20, 70));
         }
+        #endregion
 
-
+        #region methods
         //================================================
         //Private Method : methods
         //================================================
@@ -149,7 +154,7 @@ namespace Doublsb.Dialog
         {
             return new Rect(From.position + new Vector2(x, y), new Vector2(width, 16));
         }
-
+        #endregion
     }
 }
 #endif
