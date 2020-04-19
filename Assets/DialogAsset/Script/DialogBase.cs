@@ -71,7 +71,7 @@ namespace Doublsb.Dialog
             }
         }
 
-        public string[] _emotion;
+        public string[] _emotion = new string[] { "Normal" };
         public Sprite[] _sprite;
 
         //================================================
@@ -99,6 +99,7 @@ namespace Doublsb.Dialog
         //Public Variable
         //================================================
         public List<DialogCommand> Commands;
+        public string Character;
         public DialogFormat Format;
 
         public string PrintText = string.Empty;
@@ -109,21 +110,14 @@ namespace Doublsb.Dialog
         //================================================
         //Public Method
         //================================================
-        public DialogData(string originalString, bool isSkipable = true, UnityAction callback = null)
+        public DialogData(string originalString, string character = "", UnityAction callback = null, bool isSkipable = true)
         {
             _init();
             _convert(originalString);
 
             this.isSkipable = isSkipable;
             this.Callback = callback;
-        }
-
-        public DialogData(string originalString, UnityAction callback)
-        {
-            _init();
-            _convert(originalString);
-
-            this.Callback = callback;
+            this.Character = character;
         }
 
         //================================================

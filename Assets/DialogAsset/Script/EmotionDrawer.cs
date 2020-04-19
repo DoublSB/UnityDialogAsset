@@ -81,8 +81,8 @@ namespace Doublsb.Dialog
             for (int i = 0; i < _sprite.arraySize; i++)
             {
                 startPos = new Rect(startPos.position + new Vector2(0, 18), startPos.size);
-                if (GUI.Button(startPos, "-"))
-                {
+                if(_emotion.GetArrayElementAtIndex(i).stringValue != "Normal" && GUI.Button(startPos, "-"))
+                { 
                     int j = i;
                     _delete_Raw(j);
                 }
@@ -139,10 +139,23 @@ namespace Doublsb.Dialog
 
         private void _add_Raw()
         {
-            _emotion.InsertArrayElementAtIndex(_emotion.arraySize);
-            _emotion.GetArrayElementAtIndex(_emotion.arraySize - 1).stringValue = EmotionName;
+            if (!_is_duplicated_emotion_name(EmotionName))
+            {
+                _emotion.InsertArrayElementAtIndex(_emotion.arraySize);
+                _emotion.GetArrayElementAtIndex(_emotion.arraySize - 1).stringValue = EmotionName;
 
-            _sprite.InsertArrayElementAtIndex(_sprite.arraySize);
+                _sprite.InsertArrayElementAtIndex(_sprite.arraySize);
+            }
+        }
+
+        private bool _is_duplicated_emotion_name(string name)
+        {
+            for (int i = 0; i < _emotion.arraySize; i++)
+            {
+                if (_emotion.GetArrayElementAtIndex(i).stringValue == name) return true;
+            }
+
+            return false;
         }
 
         private Rect _get_Rect(Rect From, float x, float width)

@@ -37,25 +37,24 @@ namespace Doublsb.Dialog
 
         private float _currentDelay;
         private float _lastDelay;
-        private UnityAction _callback;
         private Coroutine _textingRoutine;
 
         //================================================
         //Public Method
         //================================================
         #region Show & Hide
-        public void Show(DialogData Data, Character character = null)
+        public void Show(DialogData Data)
         {
             _current_Data = Data;
-            _current_Character = character;
+            _find_character(Data.Character);
+
+            _emote("Normal");
 
             _textingRoutine = StartCoroutine(Activate());
         }
 
-        public void Show(List<DialogData> Data, Character character = null)
+        public void Show(List<DialogData> Data)
         {
-            _current_Character = character;
-
             StartCoroutine(Activate_List(Data));
         }
 
@@ -78,26 +77,36 @@ namespace Doublsb.Dialog
             Printer.SetActive(false);
             Characters.SetActive(false);
 
-            if (_callback != null) _callback.Invoke();
+            if (_current_Data.Callback != null)
+            {
+                _current_Data.Callback.Invoke();
+                _current_Data.Callback = null;
+            }
             else state = State.Deactivate;
         }
         #endregion
 
         #region Sound
 
-        public void Play_ChatSE(Character character)
+        public void Play_ChatSE()
         {
-            SEAudio.clip = character.ChatSE[UnityEngine.Random.Range(0, character.ChatSE.Length)];
-            SEAudio.Play();
+            if (_current_Character != null)
+            {
+                SEAudio.clip = _current_Character.ChatSE[UnityEngine.Random.Range(0, _current_Character.ChatSE.Length)];
+                SEAudio.Play();
+            }
         }
 
         public void Play_CallSE(string SEname)
         {
-            var FindSE
-                = Array.Find(_current_Character.CallSE, (SE) => SE.name == SEname);
+            if (_current_Character != null)
+            {
+                var FindSE
+                    = Array.Find(_current_Character.CallSE, (SE) => SE.name == SEname);
 
-            CallAudio.clip = FindSE;
-            CallAudio.Play();
+                CallAudio.clip = FindSE;
+                CallAudio.Play();
+            }
         }
 
         #endregion
@@ -133,7 +142,21 @@ namespace Doublsb.Dialog
 
         //================================================
         //Private Method
-        //================================================
+        //================================================\
+        private void Awake()
+        {
+            state = State.Deactivate;
+        }
+
+        private void _find_character(string name)
+        {
+            if (name != string.Empty)
+            {
+                Transform Child = Characters.transform.Find(name);
+                if (Child != null) _current_Character = Child.GetComponent<Character>();
+            }
+        }
+
         private void _initialize()
         {
             _currentDelay = Delay;
@@ -141,7 +164,10 @@ namespace Doublsb.Dialog
             Printer_Text.text = string.Empty;
 
             Printer.SetActive(true);
+
             Characters.SetActive(_current_Character != null);
+            foreach (Transform item in Characters.transform) item.gameObject.SetActive(false);
+            if(_current_Character != null) _current_Character.gameObject.SetActive(true);
         }
 
         #region Show Text
@@ -150,11 +176,9 @@ namespace Doublsb.Dialog
         {
             foreach (var Data in DataList)
             {
-                Show(Data, _current_Character);
+                Show(Data);
 
                 while (state != State.Deactivate) { yield return null; }
-
-                if (Data.Callback != null) Data.Callback.Invoke();
             }
         }
 
@@ -224,7 +248,7 @@ namespace Doublsb.Dialog
                 _current_Data.PrintText += Text[i];
                 Printer_Text.text = _current_Data.PrintText + _current_Data.Format.CloseTagger;
 
-                if (Text[i] != ' ') Play_ChatSE(_current_Character);
+                if (Text[i] != ' ') Play_ChatSE();
                 if (_currentDelay != 0) yield return new WaitForSeconds(_currentDelay);
             }
 
