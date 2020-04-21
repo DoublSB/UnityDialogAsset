@@ -39,7 +39,7 @@ D'Dialogue System by DoublSB, MIT LICENCE.
 -	Call Show method with created DialogData.
 
 
-## ommands
+## Commands
 You can use various commands just by editing the text.
 ![image](https://user-images.githubusercontent.com/39475849/79880315-ce214080-842a-11ea-92a2-79de7e4df0bb.png)
 
