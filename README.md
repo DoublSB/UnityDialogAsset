@@ -112,15 +112,19 @@ Change the character’s sprite while printing text.
 If you want to add new emotions to your character, follow the steps.
 
 - Open the inspector of character which you want to add emotions.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881113-ca41ee00-842b-11ea-8cf0-9a8e85b17b0c.png)
 
 - Enter the emotion’s name and click create.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881156-d4fc8300-842b-11ea-999c-af9e5e00cb08.png)
 
 - Change new emotion’s sprite.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881188-dded5480-842b-11ea-9bec-592b2d30cf35.png)
 
 - Use emote command to display new emotion.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881249-ef366100-842b-11ea-9edc-9b6886efe095.png)
 
 
@@ -134,19 +138,24 @@ Play the sound while printing text.
 If you want to play sound, you need to set Call SE. Follow the steps.
 
 - Open the inspector of character and add sound object.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881361-0a08d580-842c-11ea-9575-1546b616847e.png)
 
 - Enter the emotion’s name and click create.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881156-d4fc8300-842b-11ea-999c-af9e5e00cb08.png)
 
 - Change new emotion’s sprite.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881188-dded5480-842b-11ea-9bec-592b2d30cf35.png)
 
 - Use emote command to display new emotion.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881249-ef366100-842b-11ea-9edc-9b6886efe095.png)
 ![image](https://user-images.githubusercontent.com/39475849/79881391-13923d80-842c-11ea-84dd-d632b77c0258.png)
 
 - Now we can use sound command with sound object’s name.
+
 ![image](https://user-images.githubusercontent.com/39475849/79881424-1e4cd280-842c-11ea-8fc4-0527d6e3dc05.png)
 
 
@@ -154,23 +163,28 @@ If you want to play sound, you need to set Call SE. Follow the steps.
 
 ### Setting Chat SE
 ![image](https://user-images.githubusercontent.com/39475849/79881468-302e7580-842c-11ea-9580-483f70002bca.png)
+
 If you add Chat SE, sound will be play for each delay.
 This feature allows you to make different chat sounds for each character.
 If you set multiple ‘Chat Se’, one of the sounds will be play randomly for each delay.
 
 ### Callback
 ![image](https://user-images.githubusercontent.com/39475849/79881501-3cb2ce00-842c-11ea-92af-cc65d9579363.png)
+
 You can set callback when the window is hidden.
 When the message is over and the window is clicked, the window is hidden. After that, the callback is invoked.
 
 ### Setting Skippable
 ![image](https://user-images.githubusercontent.com/39475849/79881530-4805f980-842c-11ea-8b3f-be25b2774ae2.png)
+
 If you set ‘isSkippable’ to false, users cannot skip text even if you click on the window.
 
 ### Default text size
 ![image](https://user-images.githubusercontent.com/39475849/79881566-53f1bb80-842c-11ea-80c7-12a9ef3f41ac.png)
+
 Set DialogData.Format.DefaultSize to change default text size.
 
 ### Default print delay time
 ![image](https://user-images.githubusercontent.com/39475849/79881606-610eaa80-842c-11ea-9603-3a5b413d5d9e.png)
+
 Set default delay time at Dialog Manager inspector.
