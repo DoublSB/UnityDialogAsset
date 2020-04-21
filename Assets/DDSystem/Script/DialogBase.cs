@@ -1,4 +1,29 @@
-﻿using System.Collections.Generic;
+﻿/*
+The MIT License
+
+Copyright (c) 2020 DoublSB
+https://github.com/DoublSB/UnityDialogAsset
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Text.RegularExpressions;
@@ -104,7 +129,7 @@ namespace Doublsb.Dialog
 
         public string PrintText = string.Empty;
 
-        public bool isSkipable = true;
+        public bool isSkippable = true;
         public UnityAction Callback = null;
 
         //================================================
@@ -115,7 +140,7 @@ namespace Doublsb.Dialog
             _init();
             _convert(originalString);
 
-            this.isSkipable = isSkipable;
+            this.isSkippable = isSkipable;
             this.Callback = callback;
             this.Character = character;
         }
@@ -142,7 +167,7 @@ namespace Doublsb.Dialog
                 else // If find '/'
                 {
                     // Convert last printText to command
-                    if(printText != string.Empty)
+                    if (printText != string.Empty)
                     {
                         Commands.Add(new DialogCommand(Command.print, printText));
                         printText = string.Empty;
@@ -189,7 +214,7 @@ namespace Doublsb.Dialog
         //================================================
         //Private Variable
         //================================================
-        private string _defaultSize = "60";
+        public string DefaultSize = "60";
         private string _defaultColor = "white";
 
         private string _color;
@@ -204,7 +229,7 @@ namespace Doublsb.Dialog
             _color = string.Empty;
             _size = string.Empty;
 
-            if (defaultSize != string.Empty) _defaultSize = defaultSize;
+            if (defaultSize != string.Empty) DefaultSize = defaultSize;
             if (defaultColor != string.Empty) _defaultColor = defaultColor;
         }
 
@@ -215,7 +240,7 @@ namespace Doublsb.Dialog
                 if (isColorValid(value))
                 {
                     _color = value;
-                    if (_size == string.Empty) _size = _defaultSize; //한 쪽이 Valid면 다른 한 쪽도 Valid해야 한다
+                    if (_size == string.Empty) _size = DefaultSize;
                 }
             }
 
@@ -229,7 +254,7 @@ namespace Doublsb.Dialog
                 if (isSizeValid(value))
                 {
                     _size = value;
-                    if (_color == string.Empty) _color = _defaultColor; //한 쪽이 Valid면 다른 한 쪽도 Valid해야 한다
+                    if (_color == string.Empty) _color = _defaultColor;
                 }
             }
 
@@ -256,7 +281,7 @@ namespace Doublsb.Dialog
 
         public void Resize(string command)
         {
-            if (_size == string.Empty) Size = _defaultSize;
+            if (_size == string.Empty) Size = DefaultSize;
 
             switch (command)
             {
@@ -269,7 +294,7 @@ namespace Doublsb.Dialog
                     break;
 
                 case "init":
-                    _size = _defaultSize;
+                    _size = DefaultSize;
                     break;
 
                 default:

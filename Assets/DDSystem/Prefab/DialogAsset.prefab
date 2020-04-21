@@ -221,7 +221,6 @@ GameObject:
   - component: {fileID: 4094011683184477045}
   - component: {fileID: 4094011683184477046}
   - component: {fileID: 4094011683184477047}
-  - component: {fileID: 4094011683184477042}
   - component: {fileID: 4094011683184477043}
   - component: {fileID: 4094011683184477040}
   m_Layer: 5
@@ -269,7 +268,7 @@ MonoBehaviour:
   Printer_Text: {fileID: 4094011683009168357}
   SEAudio: {fileID: 4094011683184477043}
   CallAudio: {fileID: 4094011683184477040}
-  Delay: 0.1
+  Delay: 0.05
   state: 0
 --- !u!223 &4094011683184477045
 Canvas:
@@ -331,14 +330,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!81 &4094011683184477042
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4094011683184476936}
-  m_Enabled: 1
 --- !u!82 &4094011683184477043
 AudioSource:
   m_ObjectHideFlags: 0
@@ -447,7 +438,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.353
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
