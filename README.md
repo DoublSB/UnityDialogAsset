@@ -141,8 +141,6 @@ If you want to play sound, you need to set Call SE. Follow the steps.
 
 ![image](https://user-images.githubusercontent.com/39475849/79881361-0a08d580-842c-11ea-9575-1546b616847e.png)
 
-![image](https://user-images.githubusercontent.com/39475849/79881249-ef366100-842b-11ea-9edc-9b6886efe095.png)
-
 - Now we can use sound command with sound object’s name.
 
 ![image](https://user-images.githubusercontent.com/39475849/79881424-1e4cd280-842c-11ea-8fc4-0527d6e3dc05.png)
