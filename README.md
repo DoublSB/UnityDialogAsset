@@ -141,18 +141,7 @@ If you want to play sound, you need to set Call SE. Follow the steps.
 
 ![image](https://user-images.githubusercontent.com/39475849/79881361-0a08d580-842c-11ea-9575-1546b616847e.png)
 
-- Enter the emotion’s name and click create.
-
-![image](https://user-images.githubusercontent.com/39475849/79881156-d4fc8300-842b-11ea-999c-af9e5e00cb08.png)
-
-- Change new emotion’s sprite.
-
-![image](https://user-images.githubusercontent.com/39475849/79881188-dded5480-842b-11ea-9bec-592b2d30cf35.png)
-
-- Use emote command to display new emotion.
-
 ![image](https://user-images.githubusercontent.com/39475849/79881249-ef366100-842b-11ea-9edc-9b6886efe095.png)
-![image](https://user-images.githubusercontent.com/39475849/79881391-13923d80-842c-11ea-84dd-d632b77c0258.png)
 
 - Now we can use sound command with sound object’s name.
 
