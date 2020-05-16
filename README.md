@@ -3,6 +3,7 @@
 
 D'Dialogue System by DoublSB, MIT LICENCE.
 
+한글로 문서를 보고 싶은 경우, 이 링크로 이동하세요. [링크](https://github.com/DoublSB/UnityDialogAsset/blob/master/README_Kor.md)
 
 ## Installation
 1)	Import D’Dialogue System.
@@ -90,7 +91,7 @@ Pause the printing for amount of time.
 
 |command|description|
 |-----|------|
-|/wait/|Pause the printing for amount of time.|
+|/wait:(float)/|Pause the printing for amount of time.|
 
 
 ### Color
