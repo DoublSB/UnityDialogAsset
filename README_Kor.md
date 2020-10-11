@@ -145,6 +145,16 @@ D'Dialogue System by DoublSB, MIT LICENCE.
 
 ![image](https://user-images.githubusercontent.com/39475849/79881424-1e4cd280-842c-11ea-8fc4-0527d6e3dc05.png)
 
+## Selection
+![image](https://user-images.githubusercontent.com/39475849/95680855-63053980-0c17-11eb-9f5f-c2e87e5d6a01.png)
+
+![image](https://user-images.githubusercontent.com/39475849/95680875-8c25ca00-0c17-11eb-9419-29d2c325ee5c.png)
+
+![image](https://user-images.githubusercontent.com/39475849/95680894-b5def100-0c17-11eb-9a9b-ceeae2b05972.png)
+
+선택지를 대화창에 표시할 수도 있습니다.
+`DialogData` 클래스의 `SelectList`에 접근하여 새 선택지를 추가하세요.
+콜백을 사용하면 결과에 따라 대화창이 다르게 반응하도록 만들 수 있습니다.
 
 ## Other Settings
 
