@@ -147,6 +147,17 @@ If you want to play sound, you need to set Call SE. Follow the steps.
 ![image](https://user-images.githubusercontent.com/39475849/79881424-1e4cd280-842c-11ea-8fc4-0527d6e3dc05.png)
 
 
+## Selection
+![image](https://user-images.githubusercontent.com/39475849/95680855-63053980-0c17-11eb-9f5f-c2e87e5d6a01.png)
+
+![image](https://user-images.githubusercontent.com/39475849/95680875-8c25ca00-0c17-11eb-9419-29d2c325ee5c.png)
+
+![image](https://user-images.githubusercontent.com/39475849/95680894-b5def100-0c17-11eb-9a9b-ceeae2b05972.png)
+
+You can display choice items in the dialogue.
+Add a choice item to the `SelectList` of the `DialogData` class.
+Use callbacks to make the dialogue react differently depending on the result.
+
 ## Other Settings
 
 ### Setting Chat SE
