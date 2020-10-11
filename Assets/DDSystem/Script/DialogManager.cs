@@ -50,8 +50,16 @@ namespace Doublsb.Dialog
         [Header("Preference")]
         public float Delay = 0.1f;
 
+        [Header("Selector")]
+        public GameObject Selector;
+        public GameObject SelectorItem;
+        public Text SelectorItemText;
+
         [HideInInspector]
         public State state;
+
+        [HideInInspector]
+        public string Result;
 
         //================================================
         //Private Method
@@ -72,7 +80,8 @@ namespace Doublsb.Dialog
             _current_Data = Data;
             _find_character(Data.Character);
 
-            _emote("Normal");
+            if(_current_Character != null)
+                _emote("Normal");
 
             _textingRoutine = StartCoroutine(Activate());
         }
@@ -90,7 +99,7 @@ namespace Doublsb.Dialog
                     StartCoroutine(_skip()); break;
 
                 case State.Wait:
-                    Hide(); break;
+                    if(_current_Data.SelectList.Count <= 0) Hide(); break;
             }
         }
 
@@ -100,15 +109,26 @@ namespace Doublsb.Dialog
 
             Printer.SetActive(false);
             Characters.SetActive(false);
+            Selector.SetActive(false);
+
+            state = State.Deactivate;
 
             if (_current_Data.Callback != null)
             {
                 _current_Data.Callback.Invoke();
                 _current_Data.Callback = null;
             }
-
-            state = State.Deactivate;
         }
+        #endregion
+
+        #region Selector
+
+        public void Select(int index)
+        {
+            Result = _current_Data.SelectList.GetByIndex(index).Key;
+            Hide();
+        }
+
         #endregion
 
         #region Sound
@@ -191,6 +211,40 @@ namespace Doublsb.Dialog
             if(_current_Character != null) _current_Character.gameObject.SetActive(true);
         }
 
+        private void _init_selector()
+        {
+            _clear_selector();
+
+            if (_current_Data.SelectList.Count > 0)
+            {
+                Selector.SetActive(true);
+
+                for (int i = 0; i < _current_Data.SelectList.Count; i++)
+                {
+                    _add_selectorItem(i);
+                }
+            }
+                
+            else Selector.SetActive(false);
+        }
+
+        private void _clear_selector()
+        {
+            for (int i = 1; i < Selector.transform.childCount; i++)
+            {
+                Destroy(Selector.transform.GetChild(i).gameObject);
+            }
+        }
+
+        private void _add_selectorItem(int index)
+        {
+            SelectorItemText.text = _current_Data.SelectList.GetByIndex(index).Value;
+
+            var NewItem = Instantiate(SelectorItem, Selector.transform);
+            NewItem.GetComponent<Button>().onClick.AddListener(() => Select(index));
+            NewItem.SetActive(true);
+        }
+
         #region Show Text
 
         private IEnumerator Activate_List(List<DialogData> DataList)
@@ -200,6 +254,7 @@ namespace Doublsb.Dialog
             foreach (var Data in DataList)
             {
                 Show(Data);
+                _init_selector();
 
                 while (state != State.Deactivate) { yield return null; }
             }

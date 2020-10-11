@@ -28,6 +28,7 @@ using UnityEngine;
 using System;
 using System.Text.RegularExpressions;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace Doublsb.Dialog
 {
@@ -123,9 +124,10 @@ namespace Doublsb.Dialog
         //================================================
         //Public Variable
         //================================================
-        public List<DialogCommand> Commands;
         public string Character;
-        public DialogFormat Format;
+        public List<DialogCommand> Commands = new List<DialogCommand>();
+        public DialogSelect SelectList = new DialogSelect();
+        public DialogFormat Format = new DialogFormat();
 
         public string PrintText = string.Empty;
 
@@ -137,7 +139,6 @@ namespace Doublsb.Dialog
         //================================================
         public DialogData(string originalString, string character = "", UnityAction callback = null, bool isSkipable = true)
         {
-            _init();
             _convert(originalString);
 
             this.isSkippable = isSkipable;
@@ -148,14 +149,6 @@ namespace Doublsb.Dialog
         //================================================
         //Private Method
         //================================================
-        private void _init()
-        {
-            string PrintText = string.Empty;
-
-            Format = new DialogFormat();
-            Commands = new List<DialogCommand>();
-        }
-
         private void _convert(string originalString)
         {
             string printText = string.Empty;
@@ -336,6 +329,70 @@ namespace Doublsb.Dialog
         {
             Command = command;
             Context = context;
+        }
+    }
+
+    public class DialogSelect
+    {
+        private List<DialogSelectItem> ItemList;
+
+        public DialogSelect()
+        {
+            ItemList = new List<DialogSelectItem>();
+        }
+
+        public int Count
+        {
+            get => ItemList.Count;
+        }
+
+        public DialogSelectItem GetByIndex(int index)
+        {
+            return ItemList[index];
+        }
+
+        public List<DialogSelectItem> Get_List()
+        {
+            return ItemList;
+        }
+
+        public string Get_Value(string Key)
+        {
+            return ItemList.Find((var) => var.isSameKey(Key)).Value;
+        }
+
+        public void Clear()
+        {
+            ItemList.Clear();
+        }
+
+        public void Add(string Key, string Value)
+        {
+            ItemList.Add(new DialogSelectItem(Key, Value));
+        }
+
+        public void Remove(string Key)
+        {
+            var item = ItemList.Find((var) => var.isSameKey(Key));
+
+            if (item != null) ItemList.Remove(item);
+        }
+    }
+
+    public class DialogSelectItem
+    {
+        public string Key;
+        public string Value;
+
+        public bool isSameKey(string key)
+        {
+            return Key == key;
+        }
+
+        public DialogSelectItem(string key, string value)
+        {
+            this.Key = key;
+            this.Value = value;
         }
     }
 }
