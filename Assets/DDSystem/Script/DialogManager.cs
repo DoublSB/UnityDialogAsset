@@ -70,6 +70,7 @@ namespace Doublsb.Dialog
         private float _currentDelay;
         private float _lastDelay;
         private Coroutine _textingRoutine;
+        private Coroutine _printingRoutine;
 
         //================================================
         //Public Method
@@ -106,6 +107,7 @@ namespace Doublsb.Dialog
         public void Hide()
         {
             StopCoroutine(_textingRoutine);
+            StopCoroutine(_printingRoutine);
 
             Printer.SetActive(false);
             Characters.SetActive(false);
@@ -271,7 +273,7 @@ namespace Doublsb.Dialog
                 switch (item.Command)
                 {
                     case Command.print:
-                        yield return StartCoroutine(_print(item.Context));
+                        yield return _printingRoutine = StartCoroutine(_print(item.Context));
                         break;
 
                     case Command.color:
