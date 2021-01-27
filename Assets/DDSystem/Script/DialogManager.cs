@@ -106,8 +106,11 @@ namespace Doublsb.Dialog
 
         public void Hide()
         {
-            StopCoroutine(_textingRoutine);
-            StopCoroutine(_printingRoutine);
+            if(_textingRoutine != null)
+                StopCoroutine(_textingRoutine);
+
+            if(_printingRoutine != null)
+                StopCoroutine(_printingRoutine);
 
             Printer.SetActive(false);
             Characters.SetActive(false);
